@@ -8,42 +8,47 @@ import os
 import re
 import sys
 import urllib
-import urlparse
+from urlparse import urlparse;
 
 # jenkins update-center.json的url
 update_json_url = "http://updates.jenkins-ci.org/update-center.json?id=default&version=2.32.3"
 # 本地工作目录
-work_dir = "cache"
+work_dir = os.path.abspath("cache")
 
-url = urlparse.urlparse(update_json_url)
-# jenkins的工作目录在cache的基础上再增加一层域名
-jenkins_work_dir = os.path.join(work_dir, url.hostname)
+url = urlparse(update_json_url)
+
 schema = "http://"
 
 # 第一步，准备好工作目录，下载update-center.json和update-center.actual.json
 try:
-    os.makedirs(jenkins_work_dir)
+    os.makedirs(work_dir)
 except OSError, e:
     if e.errno != errno.EEXIST:
         raise
 
 
 def links_file_loc():
-    return os.path.join(jenkins_work_dir, "links.txt")
+    return os.path.join(work_dir, "plugins.txt")
+
+
+def sha1_file_loc():
+    return os.path.join(work_dir, "sha1.txt")
 
 
 def update_center_actual_json_loc():
-    return os.path.join(jenkins_work_dir, "update-center.actual.json")
+    return os.path.join(work_dir, "update-center.actual.json")
 
 
 #
-# 主要逻辑
+# 下载另存
 #
 
 def download_json():
     three_lines = urllib.urlopen(update_json_url).readlines()
+    # replace connectionCheckUrl
+    three_lines[1] = three_lines[1].replace('http://www.google.com/', 'http://www.baidu.com')
 
-    with open(os.path.join(jenkins_work_dir, "update-center.json"), 'w') as fp:
+    with open(os.path.join(work_dir, "update-center.json"), 'w') as fp:
         fp.writelines(three_lines)
     with open(update_center_actual_json_loc(), 'w') as fp:
         fp.write(three_lines[1])
@@ -60,7 +65,7 @@ def transform_links():
     hashes = []
     # jenkins.war
     links.append(meta['core']['url'])
-    hashes.append(base64_hex(meta['core']['sha1']) + "  " + meta['core']['url'].replace(schema, ""))
+    hashes.append(base64_hex(meta['core']['sha1']) + "  " + urlparse(meta['core']['url']).path.replace('/', '', 1))
     # plugins
     maps = meta['plugins']
     keys = maps.keys()
@@ -69,10 +74,10 @@ def transform_links():
     for item in plugins:
         links.append(item['url'])
         # shasum 的check文件要求是每行一个sum值+两个空格+文件相对路径
-        hashes.append(base64_hex(item['sha1']) + "  " + item['url'].replace(schema, ''))
-    with open(os.path.join(work_dir, "links.txt"), 'w') as fp:
+        hashes.append(base64_hex(item['sha1']) + "  " + urlparse(item['url']).path.replace('/', '', 1))
+    with open(links_file_loc(), 'w') as fp:
         fp.write("\n".join(links))
-    with open(os.path.join(work_dir, "sha1.txt"), 'w') as fp:
+    with open(sha1_file_loc(), 'w') as fp:
         fp.write("\n".join(hashes))
 
 
@@ -81,7 +86,7 @@ def transform_links():
 # 第三步，使用wget下载所有链接
 #
 """cd cache
-wget  -x -i links.txt """
+wget  -x -i plugins.txt """
 
 
 #
@@ -97,7 +102,7 @@ def check_sum():
     # 匹配成功：
     # path: OK
     # 匹配失败：
-    # links.txt: FAILED
+    # plugins.txt: FAILED
     # 如果文件读取异常（不存在，没权限）
     # shasum: links1.txt:
     # links1.txt: FAILED open or read
@@ -116,7 +121,7 @@ def check_sum():
                 error_count += 1
                 break_files.append(line.split(":")[0])
     break_hashes = []
-    for line in open("sha1.txt", 'r'):
+    for line in open(sha1_file_loc(), 'r'):
         for b in break_files:
             if line.find(b) >= 0:
                 break_hashes.append(line)
@@ -124,12 +129,11 @@ def check_sum():
         print "All files download correct."
     else:
         print str(len(break_files)) + " files break."
-
-    with open("sha1.txt", 'w') as fp:
+    with open(sha1_file_loc(), 'w') as fp:
         fp.writelines(break_hashes)
-    with open("links.txt", 'w') as fp:
+    with open(links_file_loc(), 'w') as fp:
         for line in break_files:
-            fp.write(schema + line + "\n")
+            fp.write(schema + url.hostname + "/" + line + "\n")
 
 
 #
