@@ -115,4 +115,5 @@ cd cache/updates.jenkins-ci.org
 wget -nc -nH -x -i ../tools.txt
 '''
 
+downloadUrl()
 update_links()

@@ -3,7 +3,7 @@
 ## 使用方法
 
 ### 批量下载插件
-下载目录设置为：`cache/updates.jenkins-ci.org`
+下载目录设置为：`cache`
 
     #第一步，下载好update-center.json
     ./util.sh pull
@@ -22,14 +22,14 @@
 使用任意http 文件服务器，比如node http-server 创建一个http 文件服务器
 将jenkins master机上的host文件中的updates.jenkins-ci.org指向你启动的服务器，注意要用默认的80端口
 
-    cd cache/updates.jenkins-ci.org
+    cd cache
     sudo python -m SimpleHTTPServer 80
     #其他http服务
     #npm install http-server
     #http-server
     #nginx/apach
 
-在jenkins主机上，添加一行host解析，将updates.jenkins-ci.org指向你准备好的http服务器，要注意端口必须是80。
+在jenkins主机上，添加一行host解析，将域名`updates.jenkins-ci.org`指向你准备好的http服务器，要注意端口必须是80。
 
 
 ## Jenkins update site 工作原理
