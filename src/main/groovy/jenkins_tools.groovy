@@ -93,7 +93,7 @@ def update_links() {
             links << list*.url.join("\n")
             //改写成本地URL，然后保存
             list.each({ entry ->
-                entry.url = entry.url.replaceFirst("https?://", "http://updates.jenkins-ci.org/")
+                entry.url = entry.url//.replaceFirst("https?://", "http://updates.jenkins-ci.org/")
             })
             jsonString = JsonOutput.prettyPrint(JsonOutput.toJson(json));
             it.text = lines[0] + '\n' + jsonString + '\n' + lines[-1]

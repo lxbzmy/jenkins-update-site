@@ -46,7 +46,7 @@ def update_center_actual_json_loc():
 def download_json():
     three_lines = urllib.urlopen(update_json_url).readlines()
     # replace connectionCheckUrl
-    three_lines[1] = three_lines[1].replace('http://www.google.com/', 'http://www.baidu.com')
+    three_lines[1] = three_lines[1]
 
     with open(os.path.join(work_dir, "update-center.json"), 'w') as fp:
         fp.writelines(three_lines)
