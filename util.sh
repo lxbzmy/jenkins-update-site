@@ -10,7 +10,7 @@ update)
     ;;
 wget)
     cd cache
-    wget -x -nH -nc -i links.txt
+    wget -x -nH -nc -i plugins.txt
     #-x 保持url中的目录结构
     #-nc 不重复下载
     #-i 指定一个文件，内容是一个url列表
@@ -26,6 +26,7 @@ check)
 server)
     cd cache
     python -m SimpleHTTPServer
+    ;;
 *)
     echo '参数：
 pull: 从updates.jenkins-ci.org拉取update-center.json
