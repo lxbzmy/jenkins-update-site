@@ -13,7 +13,7 @@ import java.util.regex.Pattern
 /**
  * 你Jenkins现在的版本号
  */
-@Field jenkinsVersion = '2.71'
+@Field jenkinsVersion = '2.121.1'
 /*
  * 要下载的工具包列表，ID从插件中找，或者在https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/updates/找
  */

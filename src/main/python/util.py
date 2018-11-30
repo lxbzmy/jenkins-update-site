@@ -11,7 +11,7 @@ import urllib
 from urlparse import urlparse;
 
 # jenkins update-center.json的url
-update_json_url = "http://updates.jenkins-ci.org/update-center.json?id=default&version=2.71"
+update_json_url = "http://updates.jenkins-ci.org/update-center.json?id=default&version=2.121.1"
 # 本地工作目录
 work_dir = os.path.abspath("cache")
 
