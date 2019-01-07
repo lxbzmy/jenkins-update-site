@@ -9,7 +9,7 @@ update)
     $bin update
     ;;
 wget)
-    cd cache
+    cd jenkins-update-site
     wget -x -nH -nc -i plugins.txt
     #-x 保持url中的目录结构
     #-nc 不重复下载
@@ -18,13 +18,21 @@ wget)
     #-nH, --no-host-directories 创建文件夹的时候不要带上主机名字
     #--unlink 覆盖旧文件
     #--tries=NUMBER 下载失败重试次数，0：无限制
+    echo "download tools"
+    file="tools.txt"
+    while IFS= read -r line
+    do
+      echo $line;
+      #-c 继续下载未完成的文件（需要服务器支持particial-content)
+      wget -x -nH -c -i "${line}.txt"
+    done <"$file"
     cd ..
     ;;
 check)
     $bin diff
     ;;
 server)
-    cd cache
+    cd jenkins-update-site
     #使用中发现python这个容易卡顿，不如nodejs http-server好
     python -m SimpleHTTPServer 80
     ;;

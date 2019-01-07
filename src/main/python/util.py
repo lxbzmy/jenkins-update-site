@@ -13,7 +13,7 @@ from urlparse import urlparse;
 # jenkins update-center.json的url
 update_json_url = "http://updates.jenkins-ci.org/update-center.json?id=default&version=2.121.1"
 # 本地工作目录
-work_dir = os.path.abspath("cache")
+work_dir = os.path.abspath("jenkins-update-site")
 
 url = urlparse(update_json_url)
 
@@ -37,21 +37,6 @@ def sha1_file_loc():
 
 def update_center_actual_json_loc():
     return os.path.join(work_dir, "update-center.actual.json")
-
-
-#
-# 下载另存
-#
-
-def download_json():
-    three_lines = urllib.urlopen(update_json_url).readlines()
-    # replace connectionCheckUrl
-    three_lines[1] = three_lines[1]
-
-    with open(os.path.join(work_dir, "update-center.json"), 'w') as fp:
-        fp.writelines(three_lines)
-    with open(update_center_actual_json_loc(), 'w') as fp:
-        fp.write(three_lines[1])
 
 
 #
@@ -141,7 +126,6 @@ def check_sum():
 #
 
 switch = {
-    "pull": download_json,
     "update": transform_links,
     "diff": check_sum
 }

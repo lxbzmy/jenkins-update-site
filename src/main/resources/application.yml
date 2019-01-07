@@ -1,0 +1,14 @@
+spring:
+  resources:
+    static-locations:
+    - file:jenkins-update-site/ #必须/结尾
+  jmx:
+    enabled: false
+server:
+  port: 8080
+#  tomcat:
+#    basedir: target/tomcat
+logging:
+  level:
+    root: INFO
+#    org.springframework.web: DEBUG

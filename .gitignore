@@ -3,3 +3,5 @@
 !.gitignore
 /target/
 /cache/
+/certs/
+/jenkins-update-site/

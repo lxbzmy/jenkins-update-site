@@ -18,10 +18,15 @@ import java.util.regex.Pattern
  * 要下载的工具包列表，ID从插件中找，或者在https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/updates/找
  */
 @Field tools = ['hudson.tasks.Ant.AntInstaller',
-                'hudson.tools.JDKInstaller',
                 'hudson.tasks.Maven.MavenInstaller',
                 'hudson.plugins.sonar.SonarRunnerInstaller']
-
+/**
+ * 版本号的匹配规则
+ * 3段版本号是stable的
+ * 如果没有匹配到，则用最老的 update site
+ * 2段的版本号是常规开发中的
+ * 如果没有匹配到，则会选择 刚好大于它的那个分支
+ */
 @Field String update_center_json_url = "http://updates.jenkins-ci.org/update-center.json?id=default&version=${jenkinsVersion}";
 
 /**
@@ -36,7 +41,7 @@ import java.util.regex.Pattern
 @Field File jenkinsWorkDir = new File(dir);
 
 URL urlTemplate(String id) {
-    return new URL("http://updates.jenkins-ci.org/updates/${id}.json.html?id=${id}&version=${jenkinsVersion}");
+    return new URL("http://updates.jenkins-ci.org/updates/${id}.json?id=${id}&version=${jenkinsVersion}");
 }
 
 //https://repo1.maven.org/maven2
@@ -49,6 +54,7 @@ def downloadUrl() {
         println "Fetch $url."
         String content = url.getText('utf-8')
         new File(jenkinsWorkDir, url.path).text = content;
+        
     }
 }
 
