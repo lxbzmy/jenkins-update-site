@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017-2019 lxb.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cn.devit.tools.jenkins;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -15,9 +30,12 @@ import java.util.regex.Pattern;
 
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,9 +47,13 @@ import com.google.common.io.Files;
 import cn.devit.tools.jenkins.util.ComparableVersion;
 import groovy.json.JsonSlurper;
 import net.sf.json.JSONObject;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class UpdateCenterServlet {
+    
+    static final Logger logger = LoggerFactory
+            .getLogger(UpdateCenterServlet.class);
 
     @Autowired
     Config config;
@@ -39,17 +61,46 @@ public class UpdateCenterServlet {
     @Autowired
     ServerProperties server;
 
+    @RequestMapping("/")
+    public ModelAndView index(){
+        final ModelAndView view = new ModelAndView("index");
+        view.addObject("url",getHost());
+
+        File[] files = new File(config.getDownloadDir(),"war").listFiles((f) -> {
+            return f.isDirectory();
+        });
+        List<String> path = new ArrayList<>();
+        if(files!=null){
+            for(File f:files ){
+                path.add("/download/war/"+f.getName()+"/jenkins.war");
+            }
+        }
+        view.addObject("list",path);
+
+        return view;
+    }
+
+    @RequestMapping("/get_cert")
+    @ResponseBody
+    public FileSystemResource cert(){
+        return new FileSystemResource(
+                new File(config.getCertificateDir(),
+                        "jenkins-update-site-cert.pem"));
+    }
+
+
     @RequestMapping("/update-center.json")
     @ResponseBody
     public String updateCenterJson(
             @RequestParam(required = false, defaultValue = "default") String id,
             @RequestParam(required = false) String version) {
+        
         if (hasText(version)) {
             File file = selectVersion(version);
             return readAndReSign(file);
         }
         return readAndReSign(
-                new File(config.getCacheDir(), "update-center.actual.json"));
+                new File(config.getCacheDir(), "current/update-center.actual.json"));
     }
 
     @RequestMapping("/latestCore.txt")
@@ -98,11 +149,16 @@ public class UpdateCenterServlet {
     Signer signer;
 
     public String readAndReSign(File file) {
+        File fileActual;
+        if(file.isDirectory()){
+            fileActual = new File(file, "update-center.actual.json");
+        }else{
+            fileActual = new File(file.getParentFile(), "update-center.actual.json");
+        }
+        logger.info("return {}",fileActual);
         String content;
         try {
-            content = Files.toString(
-                    new File(file.getParentFile(), "update-center.actual.json"),
-                    Charsets.UTF_8);
+            content = Files.toString(fileActual,Charsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -2,12 +2,6 @@
 
 bin="python src/main/python/util.py"
 case $1 in
-pull)
-    $bin pull
-    ;;
-update)
-    $bin update
-    ;;
 wget)
     cd jenkins-update-site
     wget -x -nH -nc -i plugins.txt
@@ -31,18 +25,10 @@ wget)
 check)
     $bin diff
     ;;
-server)
-    cd jenkins-update-site
-    #使用中发现python这个容易卡顿，不如nodejs http-server好
-    python -m SimpleHTTPServer 80
-    ;;
 *)
     echo '参数：
-pull: 从updates.jenkins-ci.org拉取update-center.json
-update: 将本地update-center.json转换成可下载的链接
 wget: 下载插件
 check: 检查下载文件的sha1，删除损坏的文件，之后可以再次wget
-server: Simple HTTP Server
 '
     ;;
 esac

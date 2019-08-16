@@ -1,31 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import base64
-import binascii
 import errno
-import json
 import os
 import re
 import sys
-import urllib
-from urlparse import urlparse;
 
-# jenkins update-center.json的url
-update_json_url = "http://updates.jenkins-ci.org/update-center.json?id=default&version=2.121.1"
 # 本地工作目录
 work_dir = os.path.abspath("jenkins-update-site")
-
-url = urlparse(update_json_url)
-
-schema = "http://"
-
-# 第一步，准备好工作目录，下载update-center.json和update-center.actual.json
-try:
-    os.makedirs(work_dir)
-except OSError, e:
-    if e.errno != errno.EEXIST:
-        raise
-
 
 def links_file_loc():
     return os.path.join(work_dir, "plugins.txt")
@@ -33,37 +14,6 @@ def links_file_loc():
 
 def sha1_file_loc():
     return os.path.join(work_dir, "sha1.txt")
-
-
-def update_center_actual_json_loc():
-    return os.path.join(work_dir, "update-center.actual.json")
-
-
-#
-# 第二步，转换出文件下载列表和sha1 文件
-#
-def transform_links():
-    def base64_hex(x): return binascii.hexlify(base64.b64decode(x))
-
-    meta = json.load(open(update_center_actual_json_loc()))
-    links = []
-    hashes = []
-    # jenkins.war
-    links.append(meta['core']['url'])
-    hashes.append(base64_hex(meta['core']['sha1']) + "  " + urlparse(meta['core']['url']).path.replace('/', '', 1))
-    # plugins
-    maps = meta['plugins']
-    keys = maps.keys()
-    keys.sort()
-    plugins = [maps[key] for key in keys]
-    for item in plugins:
-        links.append(item['url'])
-        # shasum 的check文件要求是每行一个sum值+两个空格+文件相对路径
-        hashes.append(base64_hex(item['sha1']) + "  " + urlparse(item['url']).path.replace('/', '', 1))
-    with open(links_file_loc(), 'w') as fp:
-        fp.write("\n".join(links))
-    with open(sha1_file_loc(), 'w') as fp:
-        fp.write("\n".join(hashes))
 
 
 # todo check sum
@@ -104,7 +54,11 @@ def check_sum():
         if not line.startswith("shasum: "):
             if pattern_failed.search(line):
                 error_count += 1
-                break_files.append(line.split(":")[0])
+                breakFile = line.split(":")[0];
+                break_files.append(breakFile)
+                #TODO os.delete
+                print "rm " + breakFile
+                os.remove(breakFile)
     break_hashes = []
     for line in open(sha1_file_loc(), 'r'):
         for b in break_files:
@@ -126,7 +80,6 @@ def check_sum():
 #
 
 switch = {
-    "update": transform_links,
     "diff": check_sum
 }
 cmd = sys.argv[1] if len(sys.argv) > 1 else ""

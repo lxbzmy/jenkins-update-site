@@ -2,30 +2,30 @@
 
 可以用来升级内网中的jenkins
 
-功能
+## 功能
 
-- 和官方站点一致
-- 下载插件
-- 下载jenkins.war
+- 和官方更新站点功能一致
+- 提前下载插件
+- 提前下载jenkins.war
 - 重新生成签名
 - 清理过期插件
 
-工作目录
+## 工作目录
+
+所有下载好的文件都放在 ./jenkins-update-site里面
 
 jenkins-update-site
-- cache
-- download
-- ...
-
-WebRoot
 - cache 从updates.jenkins-ci.org下载到的文件
 - download 插件目录
-- 
-- 
+- tools.txt 在其中写你要下载的工具的id
+- plugins.txt 待下载的插件列表
+- sha1.txt 检查下载文件
+- *.*.*.txt 各个工具下载地址
+
 
 ## 安装需求
 
-- JDK8   ( to run java app )
+- jdk8   ( to run and cmopile java app )
 - maven  ( to compile jar )
 - wget   ( to download file )
 - shasum ( to execute sha1sum )
@@ -37,28 +37,46 @@ WebRoot
 
     mvn package 
 
-得到插件列表
+### 得到插件列表
 
     java -jar target/*.jar pull
+
+将会连接到jenkins主站下载插件列表, cache文件夹中会下载好东西
    
-生成下载清单
+### 生成下载清单
 
     java -jar target/*.jar update
-  
-下载插件
 
-    sh utils.sh wget
+将所有插件整理成文件下载清单，plugins.txt sha1.txt会保存待下载文件列表
   
-检查下载文件完整性
+### 下载插件
+
+    sh util.sh wget
+调用wget批量下载文件  
+
+### 检查下载文件完整性
 
     sh util.sh check  
+
+检查下载文件的完整性（通过sha1sum）,plugins.txt sha1.txt会删除下载完毕的文件，保留需要重新下载的文件。
  
 重复执行`wget`和`check`直到所有文件下载成功。 
+
+### 清理插件
+
+    java -jar target/*.jar clean
+
+清理过期的不在清单中的插件
   
-启动http服务
+### 启动http服务
 
-    java -jar target/*.jar
+    java -jar target/*.jar server
+    
+启动http服务，供jenkins下载插件用。
 
+改端口
+
+    java -jar target/*.jar server --server.port=8081
 
 操作jenkins
 

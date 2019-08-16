@@ -1,8 +1,21 @@
+/*
+ * Copyright 2017-2019 lxb.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cn.devit.tools.jenkins;
-
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -27,9 +40,6 @@ import cn.devit.tools.jenkins.util.KeyTool;
 
 @SpringBootApplication
 @Configuration
-//@EnableConfigurationProperties
-//@EnableScheduling
-//@EnableAsync
 public class Application extends WebMvcConfigurerAdapter
         implements ServletContextInitializer {
 
@@ -40,27 +50,12 @@ public class Application extends WebMvcConfigurerAdapter
             throws ServletException {
     }
 
-    //    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        try {
-//            registry.addResourceHandler("/**")
-//            .addResourceLocations(new File("./target/cache2/").toURI().toURL().toString());
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
     @Bean
     public Config staticConfig() {
         File currentDirectory = new File(".");
 
         File pwd;
-
-//        File target = new File("target");
-//        if (target.exists()) {
-//            pwd = target;
-//        } else {
         pwd = new File(currentDirectory, "jenkins-update-site");
-//        }
         pwd.mkdir();
         File cache = new File(pwd, "cache");
         cache.mkdir();
@@ -70,7 +65,11 @@ public class Application extends WebMvcConfigurerAdapter
 
         config.setTools(JsonFileOutput.getToolsDownload());
 
-        config.setHost(Host.getIpv4Address().toString());
+        try {
+            config.setHost(Host.getIpv4Address().toString());
+        } catch (NullPointerException e) {
+            config.setHost("127.0.0.1");
+        }
         return config;
     }
 
@@ -118,13 +117,11 @@ public class Application extends WebMvcConfigurerAdapter
     }
 
     public static void main(String[] args) {
-//        SpringApplication.run(Application.class, args);
         File pwd = new File(".").getAbsoluteFile();
         logger.info("当前目录：{}", pwd);
 
         if (args.length > 0) {
             for (String item : args) {
-                //TODO get yaml earlier.
                 if ("pull".equals(item)) {
                     logger.info("downloading updates.jenkins-ci.org meta.");
                     File cacheDir = new Application().staticConfig()
