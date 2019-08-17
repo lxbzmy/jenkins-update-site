@@ -17,8 +17,8 @@ public class IndexFileParserTest {
     public void parseIndexFile() throws Exception {
         final List<IndexFileParser.IndexItem> list = new IndexFileParser()
                 .parseIndexFile(
-                        new URL("http://updates.jenkins-ci.org/2.89/"));
-        assertEquals(list.size(), 7);
+                        new URL("http://updates.jenkins-ci.org/current/"));
+        assertEquals(list.size(), 9);
     }
 
 }

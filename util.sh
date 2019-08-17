@@ -1,6 +1,5 @@
 #!/bin/sh
 
-bin="python src/main/python/util.py"
 case $1 in
 wget)
     cd jenkins-update-site
@@ -23,8 +22,20 @@ wget)
     cd ..
     ;;
 check)
-    $bin diff
+    java -jar target/*.jar $1
     ;;
+pull)
+    java -jar target/*.jar $1
+    ;;
+update)
+    java -jar target/*.jar $1
+    ;;
+clean)
+    java -jar target/*.jar $1
+    ;;
+server)
+    java -jar target/*.jar $@
+    ;;    
 *)
     echo '参数：
 wget: 下载插件

@@ -74,17 +74,17 @@ jenkins-update-site
     
 启动http服务，供jenkins下载插件用。
 
+访问首页会给出操作指导
+
 改端口
 
     java -jar target/*.jar server --server.port=8081
 
-操作jenkins
+## 操作jenkins
 
 1. 复制`certs/jenkins-update-site-cert.pem`到 `${JENKINS_HOME}/update-center-rootCAs/`
     
 2. 打开jenkins，插件，advance，将 http://${host}:8080/update-center.json写到更新站点文本框，保存，立即检查
-
-  
 
 ## 安装jenkins插件的其他方法：
 

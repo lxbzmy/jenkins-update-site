@@ -53,6 +53,7 @@ class ParseOneVersion {
                         println "Skip ${name}"
                     } else {
                         //save file to directory.
+                        //TODO 重构下载过程，以方便mock和测试。
                         File file = File.createTempFile("wget", "download")
                         println "Downloading ${name}"
                         Resources.copy(new URL(index, name),

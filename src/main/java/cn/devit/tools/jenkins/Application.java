@@ -146,6 +146,11 @@ public class Application extends WebMvcConfigurerAdapter
                             new Application().staticConfig());
                     logger.info("finish.");
                 }
+                if("check".equals(item)){
+                    logger.info("cleaning out date files.");
+                    new CheckAndRmBroken().run(new Application().staticConfig());
+                    logger.info("finish.");
+                }
                 if ("server".equals(item)) {
                     logger.info("web server模式");
                     SpringApplication.run(Application.class, args);
