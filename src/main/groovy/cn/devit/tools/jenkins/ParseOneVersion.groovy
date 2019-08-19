@@ -18,6 +18,9 @@ package cn.devit.tools.jenkins
 import com.google.common.io.Closer
 import com.google.common.io.Resources
 
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 /**
  * Parse one jenkins update json.
  * <p>
@@ -58,7 +61,8 @@ class ParseOneVersion {
                         println "Downloading ${name}"
                         Resources.copy(new URL(index, name),
                                 closer.register(new FileOutputStream(file)))
-                        file.renameTo(new File(pwd, name));
+                        Files.move(file.toPath(),
+                                new File(pwd,name).toPath(), StandardCopyOption.REPLACE_EXISTING);
                     }
                 } catch (IOException e) {
                     //continue.

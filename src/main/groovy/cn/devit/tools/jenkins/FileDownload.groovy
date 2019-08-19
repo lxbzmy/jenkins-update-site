@@ -19,6 +19,9 @@ import com.google.common.io.Resources
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 /**
  * Open remote url save to file.
  * <p>
@@ -34,7 +37,8 @@ public class FileDownload {
         logger.info("downloading {}", remote)
         File temp = new File(saveTo.getParentFile(), saveTo.getName() + ".downloading");
         Resources.copy(remote, temp);
-        temp.renameTo(saveTo);
+        Files.move(temp.toPath(),
+                saveTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
 }
