@@ -15,6 +15,7 @@
  */
  package cn.devit.tools.jenkins
 
+import cn.devit.tools.jenkins.util.FileDownload
 import com.google.common.io.Closer
 import com.google.common.io.Resources
 
@@ -95,9 +96,8 @@ class AllVersionParse {
                         //download to temp file then move to desire location.
                         File file = File.createTempFile("wget", "download")
                         println "Downloading ${name}"
-                        Resources.copy(new URL(index, name),
-                                closer.register(new FileOutputStream(file)))
-                        Files.move(file.toPath(),new File(pwd,name).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        FileDownload.download(new URL(index, name),new File(pwd,name));
+                        Thread.sleep(1000)
                     } else {
                         println "skip ${name}"
                     }

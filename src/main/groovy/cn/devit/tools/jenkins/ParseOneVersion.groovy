@@ -15,11 +15,14 @@
  */
 package cn.devit.tools.jenkins
 
+import cn.devit.tools.jenkins.util.FileDownload
+import cn.devit.tools.jenkins.util.UrlByteSourceWithTimeout
 import com.google.common.io.Closer
 import com.google.common.io.Resources
 
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.time.Duration
 
 /**
  * Parse one jenkins update json.
@@ -44,31 +47,22 @@ class ParseOneVersion {
             elements.each { it ->
                 String name = it.name;
                 String href = it.href;
-                try {
-                    if (name == 'latest/') {
-                        //skip latest is just Permalinks to latest files
+                if (name == 'latest/') {
+                    //skip latest is just Permalinks to latest files
 
-                    } else if (name == 'updates/') {
+                } else if (name == 'updates/') {
 
-                    } else if (isDirectory(name)) {
-                        //warning .
-                    } else if (name.endsWith(".json.html")) {
-                        println "Skip ${name}"
-                    } else {
-                        //save file to directory.
-                        //TODO 重构下载过程，以方便mock和测试。
-                        File file = File.createTempFile("wget", "download")
-                        println "Downloading ${name}"
-                        Resources.copy(new URL(index, name),
-                                closer.register(new FileOutputStream(file)))
-                        Files.move(file.toPath(),
-                                new File(pwd,name).toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    }
-                } catch (IOException e) {
-                    //continue.
-                    println "Error while downloading ${name}"
-
+                } else if (isDirectory(name)) {
+                    //warning .
+                } else if (name.endsWith(".json.html")) {
+                    println "Skip ${name}"
+                } else {
+                    //save file to directory.
+                    //TODO 重构下载过程，以方便mock和测试。
+                    FileDownload.download(new URL(index, name),new File(pwd,name));
+                    Thread.sleep(1000)
                 }
+
             }
         } finally {
             closer.close();
