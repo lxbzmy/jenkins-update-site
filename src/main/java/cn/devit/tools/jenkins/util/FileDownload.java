@@ -39,29 +39,33 @@ public class FileDownload {
 
   /**
    * 下载文件，尝试3次，设置IO超时为5分钟。成功后仍然返回保存的文件
-   *
    */
   public static File download(URL remote, File saveTo) throws IOException {
     Closer closer = Closer.create();
+    File temp = new File(saveTo.getParentFile(), saveTo.getName() + ".downloading");
+    //File file = File.createTempFile("wget", "download")
     int countDown = 3;
     while (countDown-- > 0) {
+      logger.info("downloading {}", remote);
       try {
-        File temp = new File(saveTo.getParentFile(), saveTo.getName() + ".downloading");
-        //File file = File.createTempFile("wget", "download")
-        logger.info("downloading {}", remote);
         new UrlByteSourceWithTimeout(remote, Duration.ofMinutes(5))
                 .copyTo(closer.register(new FileOutputStream(temp)));
-        Files.move(temp.toPath(),
-                saveTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
         countDown = -1;
-        return saveTo;
+        break;
       } catch (IOException e) {
+        //java.net.SocketTimeoutException
+        logger.info("Error while downloading {}, retry {}", remote.getFile(), countDown, e);
+      } finally {
         closer.close();
-        //continue.
-        logger.info("Error while downloading {}, retry {}", remote.getFile(), countDown);
       }
     }
-    throw new IOException("download " + remote + " failed.");
+    if (countDown == -1) {
+      Files.move(temp.toPath(),
+              saveTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      return saveTo;
+    } else {
+      throw new IOException("download " + remote + " failed.");
+    }
   }
 
 }
