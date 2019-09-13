@@ -25,6 +25,7 @@ public final class UrlByteSourceWithTimeout extends ByteSource {
   public InputStream openStream() throws IOException {
     final URLConnection urlConnection = url.openConnection();
     urlConnection.setConnectTimeout((int) (timeout.toMillis()));
+    urlConnection.setReadTimeout((int)(timeout.toMillis()));
     return urlConnection.getInputStream();
   }
 
