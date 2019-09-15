@@ -66,7 +66,11 @@ public class Application extends WebMvcConfigurerAdapter
         config.setTools(JsonFileOutput.getToolsDownload());
 
         try {
-            config.setHost(Host.getIpv4Address().toString());
+            String address = Host.getIpv4Address().toString();
+            if(address.startsWith("/")){
+                address = address.substring(1);
+            }
+            config.setHost(address);
         } catch (NullPointerException e) {
             config.setHost("127.0.0.1");
         }
