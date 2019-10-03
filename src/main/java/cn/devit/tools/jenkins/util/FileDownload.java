@@ -26,6 +26,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Open remote url save to file.
@@ -47,10 +48,13 @@ public class FileDownload {
     int countDown = 3;
     while (countDown-- > 0) {
       logger.info("downloading {}", remote);
+      Instant begin = Instant.now();
       try {
-        new UrlByteSourceWithTimeout(remote, Duration.ofMinutes(5))
-                .copyTo(closer.register(new FileOutputStream(temp)));
+        final UrlByteSourceWithTimeout urlByteSource = new UrlByteSourceWithTimeout(remote, Duration.ofMinutes(5));
+        urlByteSource.copyTo(closer.register(new FileOutputStream(temp)));
         countDown = -1;
+        long seconds = Duration.between(begin, Instant.now()).getSeconds();
+        logger.info("done {} bytes, {}s", urlByteSource.getContentLength(), seconds);
         break;
       } catch (IOException e) {
         //java.net.SocketTimeoutException

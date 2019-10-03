@@ -15,18 +15,26 @@ public final class UrlByteSourceWithTimeout extends ByteSource {
 
   private final URL url;
   private final Duration timeout;
+  long contentLength;
 
   public UrlByteSourceWithTimeout(@NonNull URL url, @NonNull Duration timeout) {
     this.url = checkNotNull(url);
     this.timeout = timeout;
   }
 
+
   @Override
   public InputStream openStream() throws IOException {
     final URLConnection urlConnection = url.openConnection();
     urlConnection.setConnectTimeout((int) (timeout.toMillis()));
     urlConnection.setReadTimeout((int)(timeout.toMillis()));
-    return urlConnection.getInputStream();
+    final InputStream inputStream = urlConnection.getInputStream();
+    this.contentLength = urlConnection.getContentLengthLong();
+    return inputStream;
+  }
+
+  public long getContentLength() {
+    return contentLength;
   }
 
   @Override
