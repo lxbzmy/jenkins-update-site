@@ -21,8 +21,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
 /**
- * Parse html page act as file list.
- * <p>
+ * Parse html page act as file list. and exclude parent directory
  *
  * @author lxb
  */
@@ -33,18 +32,30 @@ class IndexFileParser {
     List<IndexItem> parseIndexFile(URL url) {
         //what if 302 happened?
         Document document = Jsoup.parse(url, TimeOutIn30Seconds)
-        Elements elements = document.select("table tr td:nth-child(2) a");
+        Elements elements = document.select("table tr td a");
         Closer closer = Closer.create();
         if (elements.size() > 0) {
             List<IndexItem> list = elements.collect({ it ->
                 return new IndexItem(name: it.text(),
                         href: it.attr("href"))
             });
-            if (list[0].href.startsWith("/")) {
+            if (list[0].href.startsWith("/") || list[0].href.startsWith("../")) {
                 return list[1..-1]
             }
             return list;
         }
+        Elements elements2 = document.select("pre a");
+        if(elements2.size() > 0){
+            List<IndexItem> list = elements2.collect({ it ->
+                return new IndexItem(name: it.text(),
+                        href: it.attr("href"))
+            });
+            if (list[0].href.startsWith("/") || list[0].href.startsWith("../")) {
+                return list[1..-1]
+            }
+            return list;
+        }
+
         return [];
     }
 
