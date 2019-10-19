@@ -17,7 +17,7 @@ wget)
     do
       echo $line;
       #-c 继续下载未完成的文件（需要服务器支持particial-content)
-      wget -x -nH -c -i "${line}.txt"
+      wget -x -nH -c -i "${line}.txt" --random-wait -P download --cut-dirs 1
     done <"$file"
     cd ..
     ;;

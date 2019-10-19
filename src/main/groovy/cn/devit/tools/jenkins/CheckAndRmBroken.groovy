@@ -47,7 +47,11 @@ public class CheckAndRmBroken {
 
     public void run(Config config) {
         logger.info("检查文件sha1 {}", config.getWorkingDir())
-        List<String> result = "shasum -c sha1.txt".execute([],config.getWorkingDir()).text.readLines();
+        Process proc = new ProcessBuilder().command("shasum","-c","sha1.txt")
+        .directory(config.getWorkingDir())
+        .redirectErrorStream(true)
+        .start();
+        List<String> result = proc.text.readLines();
         /*# shasum 的输出格式
         # 每行结果的格式是：文件路径冒号空格结果
         # shasum: 开头的信息表示异常或者不匹配
@@ -70,6 +74,7 @@ public class CheckAndRmBroken {
         Pattern pattern_failed = Pattern.compile(": FAILED")
         def break_files = [];
         for(String line : result){
+            println line;
             if(!line.startsWith("shasum:")){
                 if(pattern_failed.matcher(line).find()){
                     error_count += 1
@@ -106,7 +111,7 @@ public class CheckAndRmBroken {
         }
         new File(config.getWorkingDir(),"plugins.txt").withWriter {writer->
             break_files.each {line->
-                writer.writeLine("http://updates.jenkins-ci.org/"+ line);
+                writer.writeLine(config.useMirror(Config.jenkins_update_url.toString()+ line));
             }
         }
     }

@@ -129,3 +129,5 @@ tools的自动安装也是通过update site来进行的。
 2. 服务启动时会尝试访问：https://updates.jenkins-ci.org/updates/hudson.tasks.Maven.MavenInstaller.json.html
 3. 从html中取出json，里面记录了版本号和下载地址
 4. 每当一个新的node要使用工具时会预先下载并解压（在pipeline脚本中还会提前设置path，以便shell中调用）
+
+感谢[清华大学 TUNA 协会](url "https://mirrors.tuna.tsinghua.edu.cn/") 提供jenkins site mirror 

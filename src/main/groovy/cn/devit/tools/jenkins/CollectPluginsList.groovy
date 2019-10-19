@@ -38,7 +38,7 @@ public class CollectPluginsList {
   public void collectAndSaveFile(Config config) {
     TreeMap<String, String> urlToSha1 = collectPlugins(config)
     File pluginsListFile = new File(config.workingDir, "plugins.txt");
-    pluginsListFile.text = urlToSha1.keySet().join("\n");
+    pluginsListFile.text = urlToSha1.keySet().collect {it->config.useMirror(it)}.join("\n");
 
     logger.info("save {}, contains {} urls", pluginsListFile, urlToSha1.size());
 

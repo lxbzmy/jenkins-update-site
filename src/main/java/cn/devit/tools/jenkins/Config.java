@@ -34,6 +34,14 @@ public class Config {
         }
     }
 
+    /**将插件下载地址替换成镜像地址*/
+    public String useMirror(String url){
+        //http://updates.jenkins-ci.org/download/
+        //https://mirrors.tuna.tsinghua.edu.cn/jenkins/
+        return url.replace(jenkins_update_url+"download/",
+                "https://mirrors.tuna.tsinghua.edu.cn/jenkins/");
+    }
+
 //  static 
 
     /**

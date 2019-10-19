@@ -20,4 +20,12 @@ public class CheckAndRmBrokenIT {
         new CheckAndRmBroken().run(config);
     }
 
+    @Test
+    public void run_target_tmp() throws Exception{
+
+        Config config = new Config();
+        config.setWorkingDir(new File("target/temp"));
+        new CheckAndRmBroken().run(config);
+    }
+
 }

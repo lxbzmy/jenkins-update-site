@@ -32,6 +32,8 @@ class AllVersionParse {
 
     File pwd;
 
+    String mirror = "https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/"
+
     void parseAndDownload(File downloadFolder, URL index) {
         pwd = downloadFolder;
 
@@ -44,22 +46,22 @@ class AllVersionParse {
                 //this is common in support version.
                 println "Entering ${name}"
                 File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(index, name));
+                job.parseAndSave(dir, new URL(useMirror(index), name));
             } else if (name == 'current/') {
                 //this is latest version.
                 println "Entering ${name}"
                 File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(index, name));
+                job.parseAndSave(dir, new URL(useMirror(index), name));
             } else if (name.startsWith('stable-')) {
                 //a stable version support.
                 println "Entering ${name}"
                 File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(index, name));
+                job.parseAndSave(dir, new URL(useMirror(index), name));
             } else if (name == 'stable/') {
                 //latest stable
                 println "Entering ${name}"
                 File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(index, name));
+                job.parseAndSave(dir, new URL(useMirror(index), name));
             } else if (name == 'update-center.actual.json') {
 
             } else if (name == 'update-center.json') {
@@ -68,9 +70,9 @@ class AllVersionParse {
                 //skip.
             } else if (name == 'updates/') {
                 println "Entering ${name}"
-                // go into
+                // go into tools install
                 File updatesDir = mkdir(name);
-                folderUpdateIsToolsInstallIndex(updatesDir, new URL(index, name));
+                folderUpdateIsToolsInstallIndex(updatesDir, new URL(useMirror(index), name));
 
             } else {
                 println "Skip unknown: ${name}"
@@ -83,6 +85,10 @@ class AllVersionParse {
         File dir = new File(pwd, name);
         dir.mkdir();
         return dir
+    }
+
+    URL useMirror(URL input){
+        return new URL(input.toString().replace(Config.jenkins_update_url.toString(),mirror));
     }
 
     void folderUpdateIsToolsInstallIndex(File pwd, URL index) {

@@ -48,7 +48,7 @@ class ParseOneVersion {
                 String name = it.name;
                 String href = it.href;
                 if (name == 'latest/') {
-                    //skip latest is just Permalinks to latest files
+                    //skip latest,it is just permalinks to latest files
 
                 } else if (name == 'updates/') {
 
