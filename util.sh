@@ -3,7 +3,7 @@
 case $1 in
 wget)
     cd jenkins-update-site
-    wget -x -nH -nc -i plugins.txt
+    wget -x -nH -nc -i plugins.txt --random-wait -P download --cut-dirs 1
     #-x 保持url中的目录结构
     #-nc 不重复下载
     #-i 指定一个文件，内容是一个url列表
@@ -17,7 +17,7 @@ wget)
     do
       echo $line;
       #-c 继续下载未完成的文件（需要服务器支持particial-content)
-      wget -x -nH -c -i "${line}.txt" --random-wait -P download --cut-dirs 1
+      wget -x -nH -c -i "${line}.txt"
     done <"$file"
     cd ..
     ;;
