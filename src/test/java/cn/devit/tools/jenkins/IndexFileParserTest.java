@@ -18,7 +18,7 @@ public class IndexFileParserTest {
         final List<IndexFileParser.IndexItem> list = new IndexFileParser()
                 .parseIndexFile(
                         new URL("http://updates.jenkins-ci.org/current/"));
-        assertEquals(list.size(), 9);
+        assertEquals(list.size(), 11);
     }
 
     @Test
@@ -26,14 +26,14 @@ public class IndexFileParserTest {
         final List<IndexFileParser.IndexItem> list = new IndexFileParser()
                 .parseIndexFile(
                         new URL("https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/current"));
-        assertEquals(list.size(), 7);
+        assertEquals(list.size(), 8);
     }
     @Test
     public void ustc() throws Exception {
         final List<IndexFileParser.IndexItem> list = new IndexFileParser()
                 .parseIndexFile(
                         new URL("https://mirrors.ustc.edu.cn/jenkins/updates/current/"));
-        assertEquals(list.size(), 7);
+        assertEquals(list.size(), 8);
     }
 
 }
