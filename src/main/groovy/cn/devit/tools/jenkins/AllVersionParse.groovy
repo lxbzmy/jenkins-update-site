@@ -18,6 +18,7 @@
 import cn.devit.tools.jenkins.util.FileDownload
 import com.google.common.io.Closer
 import com.google.common.io.Resources
+import groovy.json.JsonSlurper
 
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -39,45 +40,29 @@ class AllVersionParse {
 
         ParseOneVersion job = new ParseOneVersion();
 
-        List<IndexFileParser.IndexItem> list = new IndexFileParser().parseIndexFile(index);
-        list.each { it ->
-            String name = it.name;
-            if (name =~ /\d+\.\d+/) {
-                //this is common in support version.
-                println "Entering ${name}"
-                File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(useMirror(index), name));
-            } else if (name == 'current/') {
-                //this is latest version.
-                println "Entering ${name}"
-                File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(useMirror(index), name));
-            } else if (name.startsWith('stable-')) {
-                //a stable version support.
-                println "Entering ${name}"
-                File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(useMirror(index), name));
-            } else if (name == 'stable/') {
-                //latest stable
-                println "Entering ${name}"
-                File dir = mkdir(name)
-                job.parseAndSave(dir, new URL(useMirror(index), name));
-            } else if (name == 'update-center.actual.json') {
-
-            } else if (name == 'update-center.json') {
-                //skip.
-            } else if (name == 'update-center.json.html') {
-                //skip.
-            } else if (name == 'updates/') {
-                println "Entering ${name}"
-                // go into tools install
-                File updatesDir = mkdir(name);
-                folderUpdateIsToolsInstallIndex(updatesDir, new URL(useMirror(index), name));
-
-            } else {
-                println "Skip unknown: ${name}"
-            }
+        def tiersJson = new JsonSlurper().parse(new URL(index,"tiers.json"));
+        //ses:http://updates.jenkins-ci.org/tiers.json
+        tiersJson.stableCores.each{ it->
+            def name = "dynamic-stable-${it}/"
+            println "Entering ${name}"
+            File dir = mkdir(name)
+            job.parseAndSave(dir, new URL(useMirror(index), name));
         }
+        //make stable folder
+        ['stable','current','update'].each {it->
+            name = "${it}/";
+            println "Entering ${name}"
+            File dir = mkdir(name)
+            job.parseAndSave(dir, new URL(useMirror(index), name));
+        }
+
+        tiersJson.weeklyCores.each{it->
+            def name = "dynamic-${it}/"
+            println "Entering ${name}"
+            File dir = mkdir(name)
+            job.parseAndSave(dir, new URL(useMirror(index), name));
+        }
+
 
     }
 
