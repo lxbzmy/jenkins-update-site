@@ -48,16 +48,17 @@ class AllVersionParse {
             File dir = mkdir(name)
             job.parseAndSave(dir, new URL(useMirror(index), name));
         }
-        //make stable folder
-        ['stable','current','update'].each {it->
-            name = "${it}/";
+
+        tiersJson.weeklyCores.each{it->
+            def name = "dynamic-${it}/"
             println "Entering ${name}"
             File dir = mkdir(name)
             job.parseAndSave(dir, new URL(useMirror(index), name));
         }
 
-        tiersJson.weeklyCores.each{it->
-            def name = "dynamic-${it}/"
+        //make stable folder
+        ['stable','current','update'].each {it->
+            def name = "${it}/";
             println "Entering ${name}"
             File dir = mkdir(name)
             job.parseAndSave(dir, new URL(useMirror(index), name));
