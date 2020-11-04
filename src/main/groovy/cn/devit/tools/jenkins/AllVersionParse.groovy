@@ -57,7 +57,7 @@ class AllVersionParse {
         }
 
         //make stable folder
-        ['stable','current','update'].each {it->
+        ['stable','current','updates'].each {it->
             def name = "${it}/";
             println "Entering ${name}"
             File dir = mkdir(name)
