@@ -28,8 +28,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.validation.constraints.NotNull;
-
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,9 +65,7 @@ public class UpdateCenterServlet {
         final ModelAndView view = new ModelAndView("index");
         view.addObject("url",getHost());
 
-        File[] files = new File(config.getDownloadDir(),"war").listFiles((f) -> {
-            return f.isDirectory();
-        });
+        File[] files = new File(config.getDownloadDir(),"war").listFiles(File::isDirectory);
         List<String> path = new ArrayList<>();
         if(files!=null){
             for(File f:files ){
@@ -132,8 +129,8 @@ public class UpdateCenterServlet {
         return config.getHost() + ":8080";
     }
 
-    @Autowired
-    ApplicationContext applicationContext;
+//    @Autowired
+//    ApplicationContext applicationContext;
 
     @RequestMapping(value = "/config", produces = "text/plain")
     @ResponseBody
@@ -189,11 +186,12 @@ public class UpdateCenterServlet {
     /**
      * see: https://github.com/jenkins-infra/update-center2/tree/master/site
      */
-    @NotNull
+    @NonNull
     private File selectVersion(String version) {
-        File[] files = config.getCacheDir().listFiles((f) -> {
-            return f.isDirectory();
-        });
+        File[] files = config.getCacheDir().listFiles(File::isDirectory);
+        if(files==null){
+            throw new RuntimeException("没有匹配到合适的版本");
+        }
 
         Matcher matcher = dev.matcher(version);
         if (matcher.matches()) {
@@ -201,10 +199,14 @@ public class UpdateCenterServlet {
             for (File file : files) {
                 if (dev.matcher(file.getName()).matches()) {
                     list.add(new ComparableVersion(file.getName()));
+                }else if (file.getName().startsWith("dynamic-stable")) {
+                    //skip
+                }else if (file.getName().startsWith("dynamic-")) {
+                    list.add(new ComparableVersion(
+                        file.getName().replace("dynamic-", "")));
                 }
             }
             Collections.sort(list);
-
             ComparableVersion inputVersion = new ComparableVersion(version);
             String select = null;
             for (ComparableVersion branch : list) {
@@ -212,6 +214,7 @@ public class UpdateCenterServlet {
                     //branch < input version ,next.
                 } else {
                     select = branch.toString();
+                    break;
                 }
             }
             if (select == null) {
@@ -227,18 +230,24 @@ public class UpdateCenterServlet {
                 if (file.getName().startsWith("stable-")) {
                     list.add(new ComparableVersion(
                             file.getName().replace("stable-", "")));
+                }else if(file.getName().startsWith("dynamic-stable-")){
+                    list.add(new ComparableVersion(
+                        file.getName().replace("dynamic-stable-", "")));
                 }
             }
             Collections.sort(list);
-            Collections.reverse(list);
+//            Collections.reverse(list);
             ComparableVersion inputVersion = new ComparableVersion(version);
-            String selection = "stable";
+            String selection = null;
             for (ComparableVersion branch : list) {
                 if (inputVersion.compareTo(branch) >= 0) {
                     selection = branch.toString();
                 }
             }
-            return new File(config.getCacheDir(), selection);
+            if(selection==null){
+                return new File(config.getCacheDir(), "stable");
+            }
+            return new File(config.getCacheDir(), "dynamic-stable-"+selection);
         }
         return new File(config.getCacheDir(), "current");
     }

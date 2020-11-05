@@ -22,7 +22,7 @@ class RewriteUpdateSiteJson {
 
     Map<String, Object> json;
 
-    String jenkinsUpdateSite = new URL('http://updates.jenkins-ci.org')
+    String jenkinsUpdateSite = new URL('https://updates.jenkins.io')
     URL url
 
     public RewriteUpdateSiteJson(Map json) {
