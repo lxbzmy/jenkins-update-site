@@ -27,6 +27,7 @@ sed  -i -e  's/https:\\/\\/updates.jenkins.io/http:\\/\\/${url}/' hudson.model.U
 """)
         p("java -jar jenkins.war")
         p("继续完成安装")
+        p("如果url中IP地址不对，那么在启动时请添加--config.host=xxx.xxx.xxx.xxx")
         hr()
         p("LTS 三个版本号，weekly 两个版本号")
         ul {

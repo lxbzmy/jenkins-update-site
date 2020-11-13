@@ -20,7 +20,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "config")
 public class Config {
+
+    private void foo(){
+        System.out.println("");
+    }
 
     /** <code>http://updates.jenkins-ci.org/</code> */
     public static final URL jenkins_update_url = url(
@@ -58,6 +65,10 @@ public class Config {
 
     /** used at download url, must be a public accessible host */
     String host;
+    
+    private List<String> blackList;
+    
+    
 
     public void setHost(String host) {
         this.host = host;
@@ -102,6 +113,14 @@ public class Config {
 
     public File getCertificateDir() {
         return new File("certs");
+    }
+
+    public List<String> getBlackList() {
+      return blackList;
+    }
+
+    public void setBlackList(List<String> blackList) {
+      this.blackList = blackList;
     }
 
 }

@@ -12,3 +12,7 @@ logging:
   level:
     root: INFO
 #    org.springframework.web: DEBUG
+
+config:
+  black-list:
+    - 
