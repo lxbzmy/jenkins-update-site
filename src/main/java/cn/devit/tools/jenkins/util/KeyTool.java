@@ -119,7 +119,7 @@ public class KeyTool {
         CertificateFactory cf = null;
         try {
             cf = CertificateFactory.getInstance("X509");
-            Collection<X509Certificate> certs = null;
+            Collection<X509Certificate> certs;
             certs = (Collection<X509Certificate>) cf
                     .generateCertificates(file.openStream());
             for (X509Certificate item : certs) {
@@ -134,10 +134,10 @@ public class KeyTool {
 
     @SuppressWarnings("unchecked")
     public static Collection<X509Certificate> readCertificatePem(File file) {
-        CertificateFactory cf = null;
+        CertificateFactory cf;
         try {
             cf = CertificateFactory.getInstance("X509");
-            Collection<X509Certificate> certs = null;
+            Collection<X509Certificate> certs;
             certs = (Collection<X509Certificate>) cf
                     .generateCertificates(new FileInputStream(file));
             for (X509Certificate item : certs) {
